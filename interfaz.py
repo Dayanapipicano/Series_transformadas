@@ -17,23 +17,22 @@ from fourier import reconstruir_senal, calcular_espectro
 from metricas import calcular_metricas
 
 
-
 def iniciar_aplicacion():
+
+    
+    # 2. VENTANA PRINCIPAL
     
 
-    # ==========================================
-    # 2. VENTANA PRINCIPAL
-    # ==========================================
-
+    # Configurar la ventana principal de la aplicación
     ventana = tk.Tk()
     ventana.title("Reconstrucción de señales - Series de Fourier")
     ventana.geometry("1100x750")
     ventana.minsize(900, 650)
 
 
-    # == ========================================
+   
     # 3. TÍTULO
-    # ==========================================
+   
 
     titulo = ttk.Label(
        ventana,
@@ -43,10 +42,11 @@ def iniciar_aplicacion():
     titulo.pack(pady=15)
 
 
-    # ==========================================
+   
     # 4. CONFIGURACIÓN DE PARÁMETROS
-    # ==========================================
+  
 
+    # Crear el contenedor para los controles de configuración
     marco_parametros = ttk.LabelFrame(
        ventana,
        text="Configuración de la simulación",
@@ -62,6 +62,7 @@ def iniciar_aplicacion():
        text="Seleccionar señal:"
     ).grid(row=0, column=0, padx=10, pady=8)
 
+    # Variable asociada al selector de señales
     senal_seleccionada = tk.StringVar(value="Cuadrada")
 
     selector_senal = ttk.Combobox(
@@ -80,6 +81,7 @@ def iniciar_aplicacion():
        text="Número de armónicos (N):"
     ).grid(row=0, column=2, padx=10, pady=8)
 
+    # Variable asociada al número de armónicos seleccionado
     numero_armonicos = tk.StringVar(value="1")
 
     selector_armonicos = ttk.Combobox(
@@ -123,10 +125,11 @@ def iniciar_aplicacion():
     entrada_final.grid(row=1, column=3, padx=10, pady=8)
 
 
-    # ==========================================
+   
     # ÁREA DE MÉTRICAS
-    # ==========================================
+   
 
+    # Contenedor donde se muestran las métricas de evaluación
     marco_metricas = ttk.LabelFrame(
        marco_parametros,
        text="Métricas de evaluación",
@@ -166,10 +169,10 @@ def iniciar_aplicacion():
     etiqueta_potencia_reconstruida.grid(row=0, column=2, padx=20, pady=5)
 
 
-   # ==========================================
-   # 5. ÁREA DE GRÁFICAS
-   # ==========================================
+    # 5. ÁREA DE GRÁFICAS
+   
 
+    # Crear el contenedor para las gráficas de Matplotlib
     marco_graficas = ttk.LabelFrame(
        ventana,
        text="Visualización de señales",
@@ -177,6 +180,7 @@ def iniciar_aplicacion():
     )
     marco_graficas.pack(fill="both", expand=True, padx=20, pady=5)
 
+    # Crear la figura que contiene las tres gráficas
     figura = Figure(figsize=(10, 5), dpi=100)
 
     # Gráfica 1: señal original y reconstruida
@@ -201,7 +205,7 @@ def iniciar_aplicacion():
     eje3.set_ylabel("Amplitud")
     eje3.grid(True)
 
-
+    # Integrar la figura de Matplotlib dentro de la ventana Tkinter
     canvas = FigureCanvasTkAgg(
        figura,
        master=marco_graficas
@@ -211,22 +215,20 @@ def iniciar_aplicacion():
 
 
 
-
-
-
-     # ==========================================
     # 6. APLICAR PARÁMETROS Y ACTUALIZAR GRÁFICA
-    # ==========================================
+
 
     def aplicar_parametros():
 
         try:
+            # Obtener los valores seleccionados o ingresados por el usuario
             senal = senal_seleccionada.get()
             N = int(numero_armonicos.get())
 
             t_inicio = float(tiempo_inicial.get())
             t_final = float(tiempo_final.get())
 
+            # Verificar que el intervalo temporal sea válido
             if t_final <= t_inicio:
                 messagebox.showerror(
                     "Error",
@@ -234,10 +236,10 @@ def iniciar_aplicacion():
                 )
                 return
 
-            # Crear vector de tiempo
+            # Crear el vector de tiempo con 2000 muestras
             t = np.linspace(t_inicio, t_final, 2000)
 
-            # Generar señal seleccionada
+            # Generar la señal original según la selección del usuario
             if senal == "Cuadrada":
                 x = generar_senal_cuadrada(t)
 
@@ -247,22 +249,23 @@ def iniciar_aplicacion():
             elif senal == "Diente de sierra":
                 x = generar_senal_diente_sierra(t)
 
-        
-            # Reconstruir la señal mediante Fourier
+
+            # Reconstruir la señal mediante la serie de Fourier
             x_reconstruida = reconstruir_senal(t, N, senal)
 
-        
-            # Calcular error absoluto
+
+            # Calcular el error absoluto entre ambas señales
             error = np.abs(x - x_reconstruida)
 
-        
-            # Calcular métricas de desempeño
+
+            # Calcular las métricas de desempeño de la reconstrucción
             rmse, potencia_original, potencia_reconstruida = calcular_metricas(
                 x,
                 x_reconstruida
             )
 
-            # Actualizar valores en la interfaz
+
+            # Actualizar los valores de las métricas en la interfaz
             etiqueta_error.config(
                 text=f"RMSE: {rmse:.6f}"
             )
@@ -276,14 +279,14 @@ def iniciar_aplicacion():
             )
 
 
-            # Limpiar las gráficas
+            # Limpiar las gráficas anteriores para mostrar los nuevos resultados
             eje1.clear()
             eje2.clear()
             eje3.clear()
 
-            # ----------------------------------
+           
             # GRÁFICA 1: ORIGINAL Y RECONSTRUIDA
-            # ----------------------------------
+         
 
             eje1.plot(
                 t,
@@ -304,9 +307,9 @@ def iniciar_aplicacion():
             eje1.grid(True)
             eje1.legend()
 
-            # ----------------------------------
+         
             # GRÁFICA 2: ERROR ABSOLUTO
-            # ----------------------------------
+            
 
             eje2.plot(t, error, label="Error absoluto")
 
@@ -315,11 +318,11 @@ def iniciar_aplicacion():
             eje2.grid(True)
             eje2.legend()
 
-            # ----------------------------------
+         
             # GRÁFICA 3: ESPECTRO
-            # ----------------------------------
-    
+          
 
+            # Obtener las frecuencias y amplitudes de los armónicos
             frecuencias, amplitudes = calcular_espectro(N, senal)
 
             eje3.stem(frecuencias, amplitudes)
@@ -328,29 +331,30 @@ def iniciar_aplicacion():
             eje3.set_xlabel("Frecuencia (Hz)")
             eje3.set_ylabel("Amplitud")
             eje3.grid(True)
-        
 
-            # Actualizar figura
+
+            # Ajustar la distribución de las gráficas y actualizar el lienzo
             figura.tight_layout()
             canvas.draw()
 
 
-
+            # Mostrar en la interfaz los parámetros utilizados en la simulación
             mensaje_estado.config(
                 text=f"Señal: {senal} | N: {N} | "
                     f"Intervalo: [{t_inicio}, {t_final}]"
             )
 
         except ValueError:
+            # Informar al usuario cuando los valores ingresados no sean válidos
             messagebox.showerror(
                 "Error",
                 "Verifica que los valores ingresados sean válidos."
             )
 
 
-    # ==========================================
+
     # 7. BOTÓN
-    # ==========================================
+  
 
     boton_aplicar = ttk.Button(
         marco_parametros,
@@ -360,9 +364,9 @@ def iniciar_aplicacion():
     boton_aplicar.grid(row=2, column=0, columnspan=5, pady=12)
 
 
-    # ==========================================
+   
     # 8. ESTADO
-    # ==========================================
+    
 
     mensaje_estado = ttk.Label(
         ventana,
@@ -372,8 +376,8 @@ def iniciar_aplicacion():
     mensaje_estado.pack(pady=8)
 
 
-    # ==========================================
+  
     # 9. EJECUCIÓN
-    # ==========================================
+   
 
     ventana.mainloop()

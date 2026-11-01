@@ -2,9 +2,9 @@
 import numpy as np
 
 
-# ==========================================
+
 # CÁLCULO DE MÉTRICAS
-# ==========================================
+
 
 def calcular_metricas(x, x_reconstruida):
 
