@@ -53,6 +53,7 @@ def iniciar_aplicacion():
        padding=12
     )
     marco_parametros.pack(fill="x", padx=20, pady=10)
+      # Dar prioridad de espacio a la columna donde se muestran las métricas
     marco_parametros.columnconfigure(4, weight=1)
 
 
@@ -62,7 +63,7 @@ def iniciar_aplicacion():
        text="Seleccionar señal:"
     ).grid(row=0, column=0, padx=10, pady=8)
 
-    # Variable asociada al selector de señales
+    # StringVar permite vincular una variable de Python con el selector de señales
     senal_seleccionada = tk.StringVar(value="Cuadrada")
 
     selector_senal = ttk.Combobox(
@@ -100,6 +101,7 @@ def iniciar_aplicacion():
        text="Tiempo inicial:"
     ).grid(row=1, column=0, padx=10, pady=8)
 
+    # Variables vinculadas a las entradas de tiempo, con valores iniciales
     tiempo_inicial = tk.StringVar(value="-3.1416")
 
     entrada_inicio = ttk.Entry(
@@ -129,7 +131,7 @@ def iniciar_aplicacion():
     # ÁREA DE MÉTRICAS
    
 
-    # Contenedor donde se muestran las métricas de evaluación
+    # Contenedor donde se muestran los resultados de las metricas
     marco_metricas = ttk.LabelFrame(
        marco_parametros,
        text="Métricas de evaluación",
@@ -144,7 +146,7 @@ def iniciar_aplicacion():
        sticky="nsew"
     )
 
-    # Error RMSE
+    # Etiquetas que mostrarán los resultados calculados
     etiqueta_error = ttk.Label(
        marco_metricas,
        text="RMSE: --",
@@ -172,7 +174,7 @@ def iniciar_aplicacion():
     # 5. ÁREA DE GRÁFICAS
    
 
-    # Crear el contenedor para las gráficas de Matplotlib
+    # Crear el contenedor para integrar las gráficas de Matplotlib
     marco_graficas = ttk.LabelFrame(
        ventana,
        text="Visualización de señales",
@@ -192,6 +194,8 @@ def iniciar_aplicacion():
     # Gráfica 3: espectro de línea
     eje3 = figura.add_subplot(313)
 
+
+# Configurar los títulos, nombres de ejes y cuadrículas iniciales
     eje1.set_title("Señal original y reconstruida")
     eje1.set_ylabel("Amplitud")
     eje1.grid(True)
@@ -211,6 +215,8 @@ def iniciar_aplicacion():
        master=marco_graficas
     )
 
+     # Incorporar el lienzo a la ventana y permitir que ocupe el espacio disponible
+
     canvas.get_tk_widget().pack(fill="both", expand=True)
 
 
@@ -225,10 +231,12 @@ def iniciar_aplicacion():
             senal = senal_seleccionada.get()
             N = int(numero_armonicos.get())
 
+             # Convertir los tiempos ingresados a valores numéricos
+
             t_inicio = float(tiempo_inicial.get())
             t_final = float(tiempo_final.get())
 
-            # Verificar que el intervalo temporal sea válido
+             # Comprobar que el tiempo final sea mayor que el inicial
             if t_final <= t_inicio:
                 messagebox.showerror(
                     "Error",
@@ -258,14 +266,14 @@ def iniciar_aplicacion():
             error = np.abs(x - x_reconstruida)
 
 
-            # Calcular las métricas de desempeño de la reconstrucción
+            # Obtener el RMSE y las potencias de ambas señales
             rmse, potencia_original, potencia_reconstruida = calcular_metricas(
                 x,
                 x_reconstruida
             )
 
 
-            # Actualizar los valores de las métricas en la interfaz
+            # Actualizar el texto de las etiquetas con los nuevos resultados
             etiqueta_error.config(
                 text=f"RMSE: {rmse:.6f}"
             )
@@ -287,13 +295,14 @@ def iniciar_aplicacion():
            
             # GRÁFICA 1: ORIGINAL Y RECONSTRUIDA
          
-
+            # Dibujar la señal original en función del tiempo
             eje1.plot(
                 t,
                 x,
                 label="Señal original",
                 linewidth=2
             )
+            # Dibujar la señal reconstruida para compararla con la original
 
             eje1.plot(
                 t,
@@ -305,10 +314,14 @@ def iniciar_aplicacion():
             eje1.set_title(f"Señal: {senal}")
             eje1.set_ylabel("Amplitud")
             eje1.grid(True)
+
+            # Mostrar las etiquetas que identifican cada curva
             eje1.legend()
 
          
             # GRÁFICA 2: ERROR ABSOLUTO
+
+            # Representar el error absoluto calculado para cada muestra de tiempo
             
 
             eje2.plot(t, error, label="Error absoluto")
@@ -324,6 +337,8 @@ def iniciar_aplicacion():
 
             # Obtener las frecuencias y amplitudes de los armónicos
             frecuencias, amplitudes = calcular_espectro(N, senal)
+
+            # Representar el espectro mediante líneas verticales para cada armónico
 
             eje3.stem(frecuencias, amplitudes)
 
@@ -359,6 +374,7 @@ def iniciar_aplicacion():
     boton_aplicar = ttk.Button(
         marco_parametros,
         text="Aplicar parámetros",
+        # Ejecutar aplicar_parametros cuando el usuario presione el botón
         command=aplicar_parametros
     )
     boton_aplicar.grid(row=2, column=0, columnspan=5, pady=12)
@@ -379,5 +395,5 @@ def iniciar_aplicacion():
   
     # 9. EJECUCIÓN
    
-
+    # Mantener activa la ventana y atender las interacciones
     ventana.mainloop()
